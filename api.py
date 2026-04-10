@@ -11,7 +11,10 @@ from threat_detector import predict_threat
 app = Flask(__name__)
 CORS(app)
 
-model = joblib.load('phishing_model.pkl')
+# Load combined phishing models
+rf_phishing = joblib.load('phishing_rf_model.pkl')
+ann_phishing = joblib.load('phishing_ann_model.pkl')
+scaler_phishing = joblib.load('phishing_scaler.pkl')
 
 # ─── Phishing Scanner ───
 @app.route('/scan', methods=['POST'])
@@ -19,12 +22,25 @@ def scan_url():
     data = request.json
     url = data.get('url', '')
     features = extract_features(url)
-    prediction = model.predict([features])[0]
+
+    X = np.array([features])
+    X_scaled = scaler_phishing.transform(X)
+
+    rf_probs = rf_phishing.predict_proba(X_scaled)
+    ann_probs = ann_phishing.predict_proba(X_scaled)
+    combined_probs = (rf_probs + ann_probs) / 2
+
+    combined_pred = np.argmax(combined_probs, axis=1)[0]
+    classes = rf_phishing.classes_
+    prediction = classes[combined_pred]
+
+    confidence = round(float(np.max(combined_probs)) * 100, 2)
     result = 'phishing' if prediction == -1 else 'safe'
+
     return jsonify({
         'url': url,
         'result': result,
-        'confidence': '96.70%'
+        'confidence': f'{confidence}%'
     })
 
 def extract_features(url):
