@@ -1,22 +1,22 @@
-**-- EZSecure**
+**## EZSecure**
 
 EZSecure is a free, AI-powered mobile security application designed to protect everyday smartphone users from modern digital threats. Unlike paid competitors such as Bitdefender and Lookout, EZSecure requires no technical knowledge and provides comprehensive protection through a simple, intuitive interface. The app uses a combination of Artificial Neural Networks (ANN) and Random Forest (RF) machine learning models to detect phishing URLs, malware, and suspicious network activity in real time.
 
-**-- Description of how the project was implemented.**
+**-- ## Description of how the project was implemented.**
 
 
 
 
 
 
-**-- An explanation of how the code is organized and how it works**
+**-- ## An explanation of how the code is organized and how it works**
 
 
 
 
 
 
-**-- instructions for how to run and test the project**
+**-- ## instructions for how to run and test the project**
 
 **Step 1 — Clone the project:**
 git clone https://github.com/Richbean408/EZSecure.git
@@ -51,7 +51,7 @@ Then press w to open in the browser or i for the iPhone simulator.
 
 
 
-**-- Setup Requirements**
+**-- ## Setup Requirements**
 For the Python Backend:
 Python 3
 Flask
