@@ -62,3 +62,52 @@ gunicorn
 
 Install everything by running:
 pip install -r requirements.txt
+
+**-- ## Project Structure & Organization**
+EZSecure/
+|- main.py
+|- gui.py
+|- config.py
+|- requirements.txt
+|- core/
+|-ml/
+|-intel/
+|- utils/
+|- data/
+└── EZSecureApp/
+
+**-- ## Detailed Organization**
+
+core/: 
+- scanner.py: Coordinates scanning operations
+- file_scanner.py: Scans files
+- process_monitor.py: Monitors processes
+- network_monitor.py: Monitors network activity
+- threat_detector.py: Central detection logic
+- neutralizer.py: Responds to threats
+- background.py: Runs continuous monitoring
+- telemetry.py: Collects system metrics
+
+ml/: - Contains trained models and training scripts  
+intel/: - Stores known threat intelligence data  
+utils/: - Logging, alerting, and notification systems  
+data/: - Logs, hash database, and quarantined files  
+EZSecureApp/: - React Native mobile frontend 
+
+**-- ## System Operation**
+1. The system starts through main.py
+2. Monitoring begins across files, processes, and network
+3. Data is sent to the threat detector
+4. Detection occurs via:
+   - Signature-based methods
+   - Behavioral analysis
+   - Machine learning models
+5. If a threat is detected:
+   - Neutralizer takes action
+   - Alerts and logs are generated
+6. Results are displayed via GUI or mobile app
+
+**-- ## Conclusion**
+EZSecure uses a layered approach combining multiple detection techniques with real-time monitoring and response. Its modular structure allows for scalability and future enhancements.
+
+
