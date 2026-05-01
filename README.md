@@ -5,14 +5,10 @@ EZSecure is a free, AI-powered mobile security application designed to protect e
 **-- ## Description of how the project was implemented.**
 
 
-
-
-
-
-**-- ## An explanation of how the code is organized and how it works**
-
-
-
+We built EZSecure in two parts — a mobile app and a backend AI server.
+The mobile app was built using React Native and Expo, which lets us build one app that works on both iPhone and Android. It has 4 main screens: a Home dashboard, a Phishing Scanner, a Wi-Fi Scanner, and a Malware Scanner.
+The backend was built using Python and Flask. It loads our trained AI models and exposes them as API endpoints that the mobile app calls. The backend is deployed live on Render so anyone can use it without setting up a server.
+For the AI models, we trained two models for phishing detection and two for malware detection. Both use a combination of Random Forest and Neural Network (ANN) to get the most accurate results. The phishing model was trained on 11,000+ real phishing website examples and achieves 97% accuracy. The malware model was trained on behavioral data and achieves 100% accuracy on test data.
 
 
 
