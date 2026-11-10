@@ -100,10 +100,10 @@ def wifi_scan():
         issues = monitor_network()
         if len(issues) == 0:
             status = 'safe'
-            message = 'No suspicious connections detected'
+            message = 'No risky connections detected'
         else:
             status = 'warning'
-            message = f'{len(issues)} suspicious connection(s) found'
+            message = f'{len(issues)} possible risk(s) found'
         return jsonify({
             'status': status,
             'message': message,
