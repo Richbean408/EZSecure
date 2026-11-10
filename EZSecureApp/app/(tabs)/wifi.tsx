@@ -2,51 +2,65 @@ import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { ActionButton, Badge, GlassPanel, PageHeading, PanelBar, ResultPanel, ScannerGlyph, SectionHeading, TerminalScreen, TipList, ui } from '@/components/terminal-ui';
+import { type Check, runDeviceChecks } from '@/lib/network-checks';
 import { addScan } from '@/lib/scan-history';
 import { Terminal as T } from '@/constants/theme';
 
-type Result = 'safe' | 'warning' | 'error';
+type Result = 'safe' | 'warning';
+
 export default function WifiScreen() {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-  const [issues, setIssues] = useState<string[]>([]);
+  const [checks, setChecks] = useState<Check[]>([]);
   const [lastScan, setLastScan] = useState('Not scanned yet');
   const wide = useWindowDimensions().width >= 760;
+
   const scanWifi = async () => {
     if (scanning) return;
-    setScanning(true); setResult(null); setIssues([]);
+    setScanning(true); setResult(null); setChecks([]);
     try {
-      const response = await fetch('https://ezsecure-api.onrender.com/wifi-scan');
-      const data = await response.json();
-      if (!response.ok || !['safe', 'warning'].includes(data.status) || !Array.isArray(data.issues) || !data.issues.every((issue: unknown) => typeof issue === 'string')) throw new Error('Invalid scan response');
-      setResult(data.status); setIssues(data.issues);
-      addScan({ type: 'wifi', verdict: data.status === 'safe' ? 'safe' : 'flagged', detail: data.status === 'safe' ? 'No risks found' : data.issues.length + ' possible risk(s) to review' });
+      const found = await runDeviceChecks();
+      const warned = found.some((c) => c.status === 'warn');
+      setChecks(found);
+      setResult(warned ? 'warning' : 'safe');
       setLastScan(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    } catch { setResult('error'); }
-    finally { setScanning(false); }
+      const counted = found.filter((c) => c.status !== 'info');
+      addScan({ type: 'wifi', verdict: warned ? 'flagged' : 'safe', detail: `${found.filter((c) => c.status === 'pass').length}/${counted.length} checks passed` });
+    } finally { setScanning(false); }
   };
 
+  const iconFor = (c: Check) => c.status === 'pass' ? 'check-circle' : c.status === 'warn' ? 'alert-triangle' : 'info';
+  const colorFor = (c: Check) => c.status === 'pass' ? T.accent : c.status === 'warn' ? T.warning : T.muted;
+  const warnCount = checks.filter((c) => c.status === 'warn').length;
+
   return <TerminalScreen path="wifi">
-    <PageHeading eyebrow="02 / NETWORK ANALYSIS" title="Wi-Fi security" description="Check for connections to risky ports. Results are possible risks, not confirmed threats." />
+    <PageHeading eyebrow="02 / NETWORK ANALYSIS" title="Wi-Fi security" description="Check the network you are on. Results are possible risks, not confirmed threats." />
     <View style={[s.columns, wide && { flexDirection: 'row', alignItems: 'flex-start' }]}>
       <View style={wide ? ui.flex : undefined}>
         <GlassPanel>
-          <PanelBar title="network_scanner" label="NETWORK" />
+          <PanelBar title="network_scanner" label="THIS DEVICE" />
           <View style={ui.centered}>
-            <ScannerGlyph icon="wifi" tone={result === 'warning' || result === 'error' ? 'warning' : 'success'} />
-            <Badge tone={scanning || result === 'warning' || result === 'error' ? 'warning' : 'success'}>{scanning ? 'SCANNING' : result === 'safe' ? 'SCAN COMPLETE' : result === 'warning' ? 'REVIEW NEEDED' : result === 'error' ? 'TRY AGAIN' : 'READY'}</Badge>
-            <Text accessibilityLiveRegion="polite" style={ui.title}>{scanning ? 'Checking connections...' : result === 'safe' ? 'No risks found' : result === 'warning' ? 'Possible risks found' : result === 'error' ? 'Scan unavailable' : 'Take a closer look.'}</Text>
+            <ScannerGlyph icon="wifi" tone={result === 'warning' ? 'warning' : 'success'} />
+            <Badge tone={scanning || result === 'warning' ? 'warning' : 'success'}>{scanning ? 'SCANNING' : result === 'safe' ? 'SCAN COMPLETE' : result === 'warning' ? 'REVIEW NEEDED' : 'READY'}</Badge>
+            <Text accessibilityLiveRegion="polite" style={ui.title}>{scanning ? 'Checking your network...' : result === 'safe' ? 'Looks normal' : result === 'warning' ? 'Possible risks found' : 'Take a closer look.'}</Text>
             <Text style={ui.small}>Last completed scan: {lastScan}</Text>
-            <View style={{ alignSelf: 'stretch', marginTop: 4 }}><ActionButton label={scanning ? 'Scanning network...' : 'Scan Now'} loading={scanning} onPress={scanWifi} icon="wifi" /></View>
+            <View style={{ alignSelf: 'stretch', marginTop: 4 }}><ActionButton label={scanning ? 'Scanning network...' : 'Scan My Network'} loading={scanning} onPress={scanWifi} icon="wifi" /></View>
           </View>
-          <View style={s.scope}><Feather name="info" size={16} color={T.muted} /><Text style={[ui.small, ui.flex]}>This prototype checks the network of the server running the scanner, not your phone’s Wi-Fi connection.</Text></View>
+          <View style={s.scope}>
+            <Feather name="info" size={16} color={T.muted} />
+            <Text style={[ui.small, ui.flex]}>These checks run on this device and look at its own connection. A phone app can't see other devices or apps, so this is a basic check, not a full security audit.</Text>
+          </View>
         </GlassPanel>
-        {result === 'safe' && <ResultPanel tone="success" title="No risky connections found" description="No connections to known risky ports were found on the server it checked." />}
-        {result === 'warning' && <ResultPanel tone="warning" title={issues.length + ' possible risk(s)'} description="These are unusual connections, not confirmed threats. Review them below." />}
-        {result === 'error' && <ResultPanel tone="warning" title="Could not complete scan" description="The scanner could not return a result. Check your connection and try again." />}
-        {issues.length > 0 && <>
-          <SectionHeading title="Possible risks" detail={String(issues.length).padStart(2, '0') + ' FOUND'} />
-          <GlassPanel tone="warning">{issues.map((issue, i) => <View key={i} style={[s.issue, i > 0 && s.border]}><Feather name="alert-triangle" size={18} color={T.warning} /><View style={ui.flex}><Text selectable style={ui.text}>{issue}</Text><Text style={ui.small}>Possible risk, not a confirmed threat</Text></View></View>)}</GlassPanel>
+
+        {result === 'safe' && <ResultPanel tone="success" title="Your connection looks normal" description="The checks below passed. This is a basic check, not a guarantee of safety." />}
+        {result === 'warning' && <ResultPanel tone="warning" title={warnCount + ' possible risk(s)'} description="These are unusual results, not confirmed threats. Review them below." />}
+
+        {checks.length > 0 && <>
+          <SectionHeading title="Checks" detail={String(checks.length).padStart(2, '0') + ' RUN'} />
+          <GlassPanel>{checks.map((c, i) => <View key={c.id} style={[s.row, i > 0 && s.border]}>
+            <Feather name={iconFor(c)} size={18} color={colorFor(c)} />
+            <View style={ui.flex}><Text style={[ui.text, { color: T.text }]}>{c.label}</Text><Text style={ui.small}>{c.detail}</Text></View>
+          </View>)}</GlassPanel>
         </>}
       </View>
       <View style={wide ? { width: 320 } : undefined}>
@@ -59,6 +73,6 @@ export default function WifiScreen() {
 const s = StyleSheet.create({
   columns: { gap: 20 },
   scope: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', padding: 18, borderTopWidth: 1, borderTopColor: T.border },
-  issue: { flexDirection: 'row', gap: 12, padding: 18, alignItems: 'flex-start' },
+  row: { flexDirection: 'row', gap: 12, padding: 18, alignItems: 'flex-start' },
   border: { borderTopWidth: 1, borderTopColor: T.border },
 });
