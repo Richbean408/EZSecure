@@ -10,7 +10,7 @@ const tools = [
   { title: 'Phishing scanner', description: 'Look before you click.', command: 'scan --url', icon: 'link', route: '/(tabs)/phishing', label: 'OPEN SCANNER' },
   { title: 'Wi-Fi security', description: 'Inspect network activity.', command: 'scan --network', icon: 'wifi', route: '/(tabs)/wifi', label: 'OPEN SCANNER' },
   { title: 'Malware scanner', description: 'Explore AI threat detection.', command: 'scan --malware', icon: 'shield', route: '/(tabs)/malware', label: 'DEMO SCANNER' },
-  { title: 'VPN', description: 'An extra layer of privacy.', command: 'vpn --status', icon: 'lock', route: null, label: 'NOT AVAILABLE' },
+  { title: 'Password vault', description: 'Keep passwords encrypted.', command: 'vault --open', icon: 'key', route: '/(tabs)/vault', label: 'OPEN VAULT' },
 ] as const;
 
 export default function HomeScreen() {
@@ -64,7 +64,7 @@ export default function HomeScreen() {
       {tools.map((tool, i) => <View key={tool.title} style={{ width: wide ? '23.8%' : '48%' }}>
         <Pressable accessibilityRole="button" accessibilityLabel={tool.title}
           accessibilityState={{ disabled: !tool.route }} disabled={!tool.route}
-          onPress={() => { if (tool.route) router.push(tool.route); }}
+          onPress={() => { if (tool.route) router.push(tool.route as any); }}
           style={({ pressed }) => [s.toolPress, pressed && { opacity: 0.7 }]}>
           <GlassPanel style={[s.toolCard, !tool.route && { opacity: 0.65 }]}>
             <View style={s.toolTop}><View style={s.toolIcon}><Feather name={tool.icon as ComponentProps<typeof Feather>['name']} size={22} color={T.accent} /></View><Text style={s.toolIndex}>0{i + 1}</Text></View>

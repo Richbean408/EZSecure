@@ -22,6 +22,7 @@ export default function TabLayout() {
     <Tabs.Screen name="phishing" options={{ title: 'Phishing', tabBarIcon: ({ color }) => <Feather name="link" size={21} color={color} /> }} />
     <Tabs.Screen name="wifi" options={{ title: 'Wi-Fi', tabBarIcon: ({ color }) => <Feather name="wifi" size={21} color={color} /> }} />
     <Tabs.Screen name="malware" options={{ title: 'Malware', tabBarIcon: ({ color }) => <Feather name="shield" size={21} color={color} /> }} />
+    <Tabs.Screen name="vault" options={{ title: 'Vault', tabBarIcon: ({ color }) => <Feather name="lock" size={21} color={color} /> }} />
     <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: ({ color }) => <Feather name="compass" size={21} color={color} /> }} />
   </Tabs>;
 }
