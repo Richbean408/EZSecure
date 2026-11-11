@@ -8,7 +8,7 @@ import { Terminal as T } from '@/constants/theme';
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   return <Tabs screenOptions={{
-    headerShown: false, tabBarButton: HapticTab,
+    headerShown: false, tabBarButton: HapticTab as any,
     tabBarActiveTintColor: T.accent, tabBarInactiveTintColor: T.dim,
     tabBarLabelPosition: 'below-icon',
     tabBarLabelStyle: { fontFamily: T.mono, fontSize: 10, marginTop: 4 },
@@ -18,11 +18,11 @@ export default function TabLayout() {
       height: 68 + insets.bottom, paddingBottom: insets.bottom, paddingHorizontal: 4,
     },
   }}>
-    <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <Feather name="grid" size={21} color={color} /> }} />
-    <Tabs.Screen name="phishing" options={{ title: 'Phishing', tabBarIcon: ({ color }) => <Feather name="link" size={21} color={color} /> }} />
-    <Tabs.Screen name="wifi" options={{ title: 'Wi-Fi', tabBarIcon: ({ color }) => <Feather name="wifi" size={21} color={color} /> }} />
-    <Tabs.Screen name="malware" options={{ title: 'Malware', tabBarIcon: ({ color }) => <Feather name="shield" size={21} color={color} /> }} />
-    <Tabs.Screen name="vault" options={{ title: 'Vault', tabBarIcon: ({ color }) => <Feather name="lock" size={21} color={color} /> }} />
-    <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: ({ color }) => <Feather name="compass" size={21} color={color} /> }} />
+    <Tabs.Screen name="index" options={{ title: 'Home', tabBarIcon: ({ color }) => <Feather name="grid" size={21} color={color as string} /> }} />
+    <Tabs.Screen name="phishing" options={{ title: 'Phishing', tabBarIcon: ({ color }) => <Feather name="link" size={21} color={color as string} /> }} />
+    <Tabs.Screen name="wifi" options={{ title: 'Wi-Fi', tabBarIcon: ({ color }) => <Feather name="wifi" size={21} color={color as string} /> }} />
+    <Tabs.Screen name="malware" options={{ title: 'Malware', tabBarIcon: ({ color }) => <Feather name="shield" size={21} color={color as string} /> }} />
+    <Tabs.Screen name="vault" options={{ title: 'Vault', tabBarIcon: ({ color }) => <Feather name="lock" size={21} color={color as string} /> }} />
+    <Tabs.Screen name="explore" options={{ title: 'Explore', tabBarIcon: ({ color }) => <Feather name="compass" size={21} color={color as string} /> }} />
   </Tabs>;
 }
