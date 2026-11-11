@@ -20,7 +20,8 @@ _bundle = None
 def _norm(url):
     u = url.strip()
     u = re.sub(r'^[a-zA-Z][a-zA-Z0-9+.-]*://', '', u)
-    return re.sub(r'^www\.', '', u, flags=re.I)
+    u = re.sub(r'^www\.', '', u, flags=re.I)
+    return re.sub(r'/+$', '', u)  # a trailing slash must not change the verdict
 
 
 def _split(n):
