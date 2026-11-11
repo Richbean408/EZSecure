@@ -7,6 +7,7 @@ import os
 from urllib.parse import urlparse
 from network_monitor import monitor_network
 from threat_detector import predict_threat
+import url_model
 
 app = Flask(__name__)
 CORS(app)
@@ -17,10 +18,43 @@ ann_phishing = joblib.load('phishing_ann_model.pkl')
 scaler_phishing = joblib.load('phishing_scaler.pkl')
 
 # ─── Phishing Scanner ───
+PHISHING_THRESHOLD = 0.5
+
+
+def _valid_url(url):
+    """Reject empty or obviously non-URL input instead of guessing."""
+    if not url or len(url) > 2000 or ' ' in url.strip():
+        return False
+    host = urlparse(url if '://' in url else 'http://' + url).hostname or ''
+    return '.' in host and len(host) >= 4
+
+
+# ─── Phishing Scanner ───
 @app.route('/scan', methods=['POST'])
 def scan_url():
-    data = request.json
-    url = data.get('url', '')
+    data = request.get_json(silent=True) or {}
+    url = str(data.get('url', '')).strip()
+
+    if not _valid_url(url):
+        return jsonify({'error': 'Please enter a full link, for example https://example.com/page'}), 400
+
+    # Preferred: URL-only model (features computed from the link itself,
+    # identical to training). Falls back to the older model if the file is missing.
+    if url_model.model_available():
+        p = url_model.phishing_probability(url)
+        is_phishing = p >= PHISHING_THRESHOLD
+        confidence = round((p if is_phishing else 1 - p) * 100, 2)
+        return jsonify({
+            'url': url,
+            'result': 'phishing' if is_phishing else 'safe',
+            'confidence': f'{confidence}%',
+            'phishing_probability': round(p, 4),
+            'model': 'url-v2',
+        })
+    return scan_url_legacy(url)
+
+
+def scan_url_legacy(url):
     features = extract_features(url)
 
     X = np.array([features])
@@ -40,7 +74,8 @@ def scan_url():
     return jsonify({
         'url': url,
         'result': result,
-        'confidence': f'{confidence}%'
+        'confidence': f'{confidence}%',
+        'model': 'legacy'
     })
 
 def extract_features(url):
