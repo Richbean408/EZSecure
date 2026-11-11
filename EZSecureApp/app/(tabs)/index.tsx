@@ -43,20 +43,6 @@ export default function HomeScreen() {
           <Text style={[ui.small, { marginTop: 1 }]}>No scan running. Choose a tool to begin.</Text>
         </View>
       </GlassPanel>
-      <GlassPanel style={[s.session, wide && { width: 304 }]}>
-        <PanelBar title="console" label="EZ" />
-        <View style={s.consoleBody}>
-          <View style={s.shieldRing}><View style={s.shieldInner}><Feather name="shield" color={T.accent} size={45} /></View></View>
-          <Text style={ui.command}>$ ezsecure --ready</Text>
-          <View style={{ gap: 10, alignSelf: 'stretch' }}>
-            <ConsoleLine label="Phishing scanner" value="READY" />
-            <ConsoleLine label="Wi-Fi security" value="READY" />
-            <ConsoleLine label="Malware scanner" value="DEMO" />
-          </View>
-          <View style={ui.divider} />
-          <Text style={ui.small}>Select a scanner to request a result.</Text>
-        </View>
-      </GlassPanel>
     </View>
 
     <SectionHeading title="Security tools" detail="SELECT A MODULE" />
@@ -95,10 +81,6 @@ export default function HomeScreen() {
   </TerminalScreen>;
 }
 
-function ConsoleLine({ label, value }: { label: string; value: string }) {
-  return <View style={s.consoleLine}><Text style={ui.small}>{label}</Text><Text style={[ui.small, { color: T.accent }]}>{value}</Text></View>;
-}
-
 const s = StyleSheet.create({
   welcome: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10, marginBottom: 18 },
   eyebrow: { fontFamily: T.mono, fontSize: 10, letterSpacing: 1.6, color: T.accent, lineHeight: 18 },
@@ -106,11 +88,6 @@ const s = StyleSheet.create({
   hero: { flex: 1 },
   heroBody: { padding: 24, gap: 18 },
   headline: { fontFamily: T.mono, color: T.text, fontSize: 28, lineHeight: 38, fontWeight: '700', letterSpacing: -1.5 },
-  session: { flexShrink: 0 },
-  consoleBody: { padding: 22, gap: 20 },
-  shieldRing: { width: 110, height: 110, borderWidth: 1, borderColor: 'rgba(119,245,164,.12)', borderRadius: 55, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(119,245,164,.025)' },
-  shieldInner: { width: 80, height: 80, borderWidth: 1, borderColor: 'rgba(119,245,164,.3)', borderRadius: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(119,245,164,.04)' },
-  consoleLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   tools: { flexDirection: 'row', flexWrap: 'wrap', gap: '1.6%', rowGap: 14, justifyContent: 'space-between' },
   toolPress: { flex: 1 },
   toolCard: { padding: 18, height: '100%' },

@@ -42,7 +42,7 @@ export default function PhishingScreen() {
   return <TerminalScreen path="phishing">
     <PageHeading eyebrow="01 / LINK ANALYSIS" title="Phishing scanner" description="A second look, before the first click. Paste a link to check for signs of phishing." />
     <GlassPanel>
-      <PanelBar title="url_scanner" label="RF + ANN" />
+      <PanelBar title="url_scanner" label="RANDOM FOREST" />
       <View style={ui.body}>
         <Badge tone={scanning ? 'warning' : 'success'}>{scanning ? 'ANALYZING URL' : 'AWAITING INPUT'}</Badge>
         <Text style={ui.command}>$ scan --url</Text>
@@ -63,8 +63,8 @@ export default function PhishingScreen() {
         {scanning && <Text accessibilityLiveRegion="polite" style={ui.command}>{'> '}Waiting for the analysis service...</Text>}
       </View>
     </GlassPanel>
-    {result === 'safe' && <ResultPanel tone="success" title="No phishing detected" description="The model classified this link as safe. A scan result is not a guarantee that a site is trustworthy." />}
-    {result === 'phishing' && <ResultPanel tone="danger" title="Phishing detected" description="This link shows signs of phishing. Avoid opening it or entering personal information." />}
+    {result === 'safe' && <ResultPanel tone="success" title="No signs of phishing found" description="The model did not flag this link. This is not a guarantee that a site is trustworthy, so stay careful with links you were not expecting." />}
+    {result === 'phishing' && <ResultPanel tone="danger" title="Possible phishing" description="This link looks similar to known phishing links. Avoid opening it or entering personal information. The model can be wrong, so check the sender if you can." />}
     {result === 'error' && <ResultPanel tone="warning" title="Could not complete scan" description="The scanner could not return a result. Check your connection and try again." />}
     {result && <Text selectable style={[ui.small, { marginTop: 10 }]}>Analyzed: {scannedUrl}</Text>}
 
