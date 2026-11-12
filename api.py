@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from network_monitor import monitor_network
 from threat_detector import predict_threat
 import url_model
+from trusted import is_trusted
 
 app = Flask(__name__)
 CORS(app)
@@ -18,7 +19,7 @@ ann_phishing = joblib.load('phishing_ann_model.pkl')
 scaler_phishing = joblib.load('phishing_scaler.pkl')
 
 # ─── Phishing Scanner ───
-PHISHING_THRESHOLD = 0.5
+PHISHING_THRESHOLD = 0.6
 
 
 def _valid_url(url):
@@ -37,6 +38,16 @@ def scan_url():
 
     if not _valid_url(url):
         return jsonify({'error': 'Please enter a full link, for example https://example.com/page'}), 400
+
+    # Well-known sites (docs.google.com, canvas, data.mendeley.com...) skip the model.
+    if is_trusted(url):
+        return jsonify({
+            'url': url,
+            'result': 'safe',
+            'confidence': 'known site',
+            'phishing_probability': 0.0,
+            'model': 'trusted-list',
+        })
 
     # Preferred: URL-only model (features computed from the link itself,
     # identical to training). Falls back to the older model if the file is missing.
