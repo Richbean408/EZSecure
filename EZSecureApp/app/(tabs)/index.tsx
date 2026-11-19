@@ -31,7 +31,7 @@ export default function HomeScreen() {
     malware: { title: 'Malware scan (demo)', icon: 'shield' },
   };
   return <TerminalScreen path="overview">
-    <View style={s.welcome}><Text style={s.eyebrow}>YOUR SECURITY, SIMPLIFIED</Text><Text style={ui.small}>Welcome back, Richard.</Text></View>
+    <View style={s.welcome}><Text style={s.eyebrow}>YOUR SECURITY, SIMPLIFIED</Text><Text style={ui.small}>Welcome back.</Text></View>
     <View style={[s.heroRow, wide && { flexDirection: 'row' }]}>
       <GlassPanel style={wide ? s.hero : undefined}>
         <PanelBar title="security_overview" label="01" />
